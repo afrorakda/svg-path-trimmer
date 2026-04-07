@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SVG Path Trimmer</title>
+    
+    <link rel="icon" href="image_90.png">
+    <link rel="apple-touch-icon" href="image_90.png">
+
+    <style>
+        :root {
+            --main: #333;
+            --bg: #fff;
+            --accent: #ccc;
+            --input-bg: #fafafa;
+            --radius: 15px;
+            --text-gray: #666;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -1px; }
+        .subtitle { font-size: 0.9rem; color: var(--text-gray); font-weight: 600; margin-bottom: 25px; }
+
+        .input-group { position: relative; text-align: left; margin-bottom: 20px; }
+        .input-label { font-size: 0.85rem; font-weight: 800; color: var(--main); margin-bottom: 8px; display: block; padding-left: 5px; }
+        
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: var(--radius);
+            background: var(--input-bg);
+            font-size: 0.85rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            color: var(--main);
+            box-sizing: border-box;
+            outline: none;
+            resize: none;
+            -webkit-appearance: none;
+        }
+
+        .clear-btn {
+            position: absolute; right: 10px; bottom: 10px;
+            background: rgba(255,255,255,0.8); border: none; color: #888;
+            font-size: 1.2rem; font-weight: 800; cursor: pointer;
+            padding: 5px 10px; border-radius: 8px;
+        }
+
+        .stats-bar {
+            background: var(--main);
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .preview-area {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #fff;
+            border: 2px solid #eee;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .preview-area svg { width: 100%; height: 100%; object-fit: contain; }
+
+        .copy-btn {
+            width: 100%;
+            background: var(--main);
+            color: #fff;
+            padding: 18px;
+            border-radius: var(--radius);
+            border: none;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .copy-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--main); color: #fff;
+            padding: 12px 24px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
+        }
+
+        footer { margin-top: 60px; font-size: 12px; color: #777; line-height: 1.8; font-weight: 500; }
+        footer a { color: inherit; text-decoration: underline; }
+        .footer-btns { margin-top: 30px; }
+        .kofi-btn {
+            display: inline-block; background: var(--main); color: #fff;
+            padding: 14px 28px; border-radius: var(--radius);
+            text-decoration: none; font-weight: bold; font-size: 15px; margin-bottom: 15px;
+        }
+        .home-btn {
+            display: block; width: 70%; margin: 0 auto; background: var(--accent);
+            color: var(--main); border: none; padding: 12px;
+            border-radius: var(--radius); font-weight: 800; font-size: 14px; cursor: pointer;
+        }
+
+        #modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-content {
+            background: #fff; width: 85%; max-width: 340px; padding: 35px;
+            border-radius: var(--radius); text-align: left; position: relative;
+        }
+        .close-x { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #888; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="toast">Copied!</div>
+
+<div class="container">
+    <h1>SVG Path Trimmer</h1>
+    <p class="subtitle">Shave off the bloat from your SVG code.</p>
+
+    <div class="input-group">
+        <span class="input-label">Paste SVG Code</span>
+        <textarea id="svgInput" placeholder='<svg ...> ... </svg>' oninput="processSVG()"></textarea>
+        <button class="clear-btn" onclick="clearAll()">×</button>
+    </div>
+
+    <div class="stats-bar">
+        <span>Reduced: <span id="reducedBytes">0</span> B</span>
+        <span>Rate: <span id="reducedRate">0</span> %</span>
+    </div>
+
+    <div class="preview-area" id="svgPreview">
+        <span style="color: #ccc; font-weight: 800;">Preview</span>
+    </div>
+
+    <button class="copy-btn" onclick="copyResult()">Copy Trimmed SVG</button>
+
+    <div class="footer-btns">
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
+        <button class="home-btn" onclick="showModal()">Add to Home Screen</button>
+    </div>
+
+    <footer>
+        <div>No login / No tracking / No ads / Browser only</div>
+        <div><a href="https://afrorakda.com/privacy/">Privacy Policy</a> / afrorakda © 2026</div>
+    </footer>
+</div>
+
+<div id="modal" onclick="hideModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-x" onclick="hideModal()">×</span>
+        <h3>📱 Install</h3>
+        <p>Add to your home screen.</p>
+        <p>🍏 <strong>iPhone (Safari):</strong><br>Tap Share, then Add to Home Screen.</p>
+        <p>🤖 <strong>Android (Chrome):</strong><br>Tap Menu (⋮), then Add to Home Screen.</p>
+    </div>
+</div>
+
+<script>
+    const svgInput = document.getElementById('svgInput');
+    const svgPreview = document.getElementById('svgPreview');
+    const reducedBytes = document.getElementById('reducedBytes');
+    const reducedRate = document.getElementById('reducedRate');
+    const toast = document.getElementById('toast');
+    let trimmedCode = "";
+
+    function processSVG() {
+        const raw = svgInput.value.trim();
+        if (!raw) {
+            resetStats();
+            return;
+        }
+
+        try {
+            // 1. メタデータとコメントの削除
+            let clean = raw.replace(/<\?xml.*?\?>/gi, '')
+                           .replace(/<!DOCTYPE.*?>/gi, '')
+                           .replace(//g, '');
+
+            // 2. 不要な属性の削除 (id, class, version, xmlns:xlink, etc.)
+            clean = clean.replace(/\s(id|class|version|xmlns:xlink|xml:space|enable-background|x|y|style)=".*?"/gi, '');
+            
+            // 3. 長すぎる小数点のトリミング (d属性などの数値)
+            // 数値を見つけ、小数点第2位までに丸める
+            clean = clean.replace(/(\d+\.\d{3,})/g, (match) => {
+                return parseFloat(parseFloat(match).toFixed(2));
+            });
+
+            // 4. 空白の圧縮
+            clean = clean.replace(/>\s+</g, '><').trim();
+
+            trimmedCode = clean;
+            
+            // プレビュー更新
+            svgPreview.innerHTML = trimmedCode;
+            
+            // 統計更新
+            const originalSize = raw.length;
+            const newSize = trimmedCode.length;
+            const diff = originalSize - newSize;
+            reducedBytes.innerText = diff > 0 ? diff : 0;
+            reducedRate.innerText = originalSize > 0 ? Math.round((diff / originalSize) * 100) : 0;
+
+        } catch (e) {
+            svgPreview.innerHTML = '<span style="color:red; font-size:0.8rem">Invalid SVG Code</span>';
+        }
+    }
+
+    function resetStats() {
+        svgPreview.innerHTML = '<span style="color: #ccc; font-weight: 800;">Preview</span>';
+        reducedBytes.innerText = '0';
+        reducedRate.innerText = '0';
+        trimmedCode = "";
+    }
+
+    function clearAll() {
+        svgInput.value = '';
+        resetStats();
+        svgInput.focus();
+    }
+
+    async function copyResult() {
+        if (!trimmedCode) return;
+        try {
+            await navigator.clipboard.writeText(trimmedCode);
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 1500);
+        } catch (err) {}
+    }
+
+    function showModal() { document.getElementById('modal').style.display = 'flex'; }
+    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+</script>
+
+</body>
+</html>
