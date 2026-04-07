@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SVG Path Trimmer</title>
     
     <link rel="icon" href="image_90.png">
@@ -16,6 +16,21 @@
             --input-bg: #fafafa;
             --radius: 15px;
             --text-gray: #666;
+        }
+
+        /* iOSでの誤動作を徹底防止 */
+        * {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 入力エリアだけは選択可能にする */
+        textarea {
+            -webkit-user-select: text !important;
+            user-select: text !important;
         }
 
         body {
@@ -35,6 +50,8 @@
             padding: 40px 20px;
             box-sizing: border-box;
             text-align: center;
+            position: relative;
+            z-index: 5;
         }
 
         h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -1px; }
@@ -45,25 +62,28 @@
         
         textarea {
             width: 100%;
-            height: 160px;
+            height: 140px;
             padding: 15px;
             border: 2px solid var(--accent);
             border-radius: var(--radius);
             background: var(--input-bg);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
             color: var(--main);
-            box-sizing: border-box;
             outline: none;
             resize: none;
             -webkit-appearance: none;
+            pointer-events: auto; /* 確実に触れるように */
         }
+        textarea::placeholder { color: #bbb; }
 
-        .clear-btn {
+        .clr-btn {
             position: absolute; right: 10px; bottom: 10px;
-            background: rgba(255,255,255,0.8); border: none; color: #888;
-            font-size: 1.2rem; font-weight: 800; cursor: pointer;
-            padding: 5px 10px; border-radius: 8px;
+            background: #fff; border: 1px solid var(--accent); color: var(--main);
+            font-size: 1rem; font-weight: 800; cursor: pointer;
+            padding: 5px 12px; border-radius: 8px;
+            pointer-events: auto;
+            touch-action: manipulation;
         }
 
         .stats-bar {
@@ -73,7 +93,7 @@
             border-radius: 12px;
             display: flex;
             justify-content: space-around;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 800;
             margin-bottom: 20px;
         }
@@ -90,8 +110,15 @@
             margin-bottom: 25px;
             padding: 20px;
             overflow: hidden;
+            background-image: 
+                linear-gradient(45deg, #f9f9f9 25%, transparent 25%), 
+                linear-gradient(-45deg, #f9f9f9 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #f9f9f9 75%), 
+                linear-gradient(-45deg, transparent 75%, #f9f9f9 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
-        .preview-area svg { width: 100%; height: 100%; object-fit: contain; }
+        .preview-area svg { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         .copy-btn {
             width: 100%;
@@ -103,37 +130,43 @@
             font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
-            transition: transform 0.1s;
+            pointer-events: auto;
+            touch-action: manipulation;
         }
-        .copy-btn:active { transform: scale(0.98); opacity: 0.9; }
+        .copy-btn:active { opacity: 0.8; transform: scale(0.98); }
 
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--main); color: #fff;
-            padding: 12px 24px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;
+            padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;
             opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
         }
 
-        footer { margin-top: 60px; font-size: 12px; color: #777; line-height: 1.8; font-weight: 500; }
+        footer { margin-top: 50px; font-size: 11px; color: #999; line-height: 1.8; }
         footer a { color: inherit; text-decoration: underline; }
-        .footer-btns { margin-top: 30px; }
+        
+        .footer-btns { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
         .kofi-btn {
             display: inline-block; background: var(--main); color: #fff;
-            padding: 14px 28px; border-radius: var(--radius);
-            text-decoration: none; font-weight: bold; font-size: 15px; margin-bottom: 15px;
+            padding: 12px 24px; border-radius: var(--radius);
+            text-decoration: none; font-weight: bold; font-size: 14px;
+            pointer-events: auto; touch-action: manipulation;
         }
         .home-btn {
-            display: block; width: 70%; margin: 0 auto; background: var(--accent);
-            color: var(--main); border: none; padding: 12px;
-            border-radius: var(--radius); font-weight: 800; font-size: 14px; cursor: pointer;
+            width: 70%; background: #eee;
+            color: var(--main); border: none; padding: 10px;
+            border-radius: var(--radius); font-weight: 800; font-size: 13px; cursor: pointer;
+            pointer-events: auto; touch-action: manipulation;
         }
 
+        /* モーダル */
         #modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 200;
+            pointer-events: auto;
         }
         .modal-content {
-            background: #fff; width: 85%; max-width: 340px; padding: 35px;
+            background: #fff; width: 85%; max-width: 340px; padding: 30px;
             border-radius: var(--radius); text-align: left; position: relative;
         }
         .close-x { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #888; cursor: pointer; }
@@ -144,22 +177,22 @@
 <div id="toast">Copied!</div>
 
 <div class="container">
-    <h1>SVG Path Trimmer</h1>
-    <p class="subtitle">Shave off the bloat from your SVG code.</p>
+    <h1>SVG Trimmer</h1>
+    <p class="subtitle">Minimalize your SVG code instantly.</p>
 
     <div class="input-group">
         <span class="input-label">Paste SVG Code</span>
         <textarea id="svgInput" placeholder='<svg ...> ... </svg>' oninput="processSVG()"></textarea>
-        <button class="clear-btn" onclick="clearAll()">×</button>
+        <button class="clr-btn" onclick="clearAll()">×</button>
     </div>
 
     <div class="stats-bar">
-        <span>Reduced: <span id="reducedBytes">0</span> B</span>
-        <span>Rate: <span id="reducedRate">0</span> %</span>
+        <span>Reduced: <span id="redB">0</span> B</span>
+        <span>Rate: <span id="redR">0</span> %</span>
     </div>
 
-    <div class="preview-area" id="svgPreview">
-        <span style="color: #ccc; font-weight: 800;">Preview</span>
+    <div class="preview-area" id="previewContainer">
+        <span id="previewLabel" style="color: #ccc; font-weight: 800;">Preview</span>
     </div>
 
     <button class="copy-btn" onclick="copyResult()">Copy Trimmed SVG</button>
@@ -187,74 +220,71 @@
 
 <script>
     const svgInput = document.getElementById('svgInput');
-    const svgPreview = document.getElementById('svgPreview');
-    const reducedBytes = document.getElementById('reducedBytes');
-    const reducedRate = document.getElementById('reducedRate');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewLabel = document.getElementById('previewLabel');
+    const redB = document.getElementById('redB');
+    const redR = document.getElementById('redR');
     const toast = document.getElementById('toast');
-    let trimmedCode = "";
+    let trimmedOutput = "";
 
     function processSVG() {
         const raw = svgInput.value.trim();
         if (!raw) {
-            resetStats();
+            resetAll();
             return;
         }
 
         try {
-            // 1. メタデータとコメントの削除
-            let clean = raw.replace(/<\?xml.*?\?>/gi, '')
-                           .replace(/<!DOCTYPE.*?>/gi, '')
-                           .replace(//g, '');
+            // クリーニング開始
+            let clean = raw
+                .replace(/<\?xml.*?\?>/gi, '')
+                .replace(/<!DOCTYPE.*?>/gi, '')
+                .replace(//g, '')
+                .replace(/\s(id|class|version|xmlns:xlink|xml:space|enable-background|x|y|style|sodipodi:docname|inkscape:version)=".*?"/gi, '')
+                .replace(/(\d+\.\d{3,})/g, m => parseFloat(parseFloat(m).toFixed(2)))
+                .replace(/>\s+</g, '><')
+                .trim();
 
-            // 2. 不要な属性の削除 (id, class, version, xmlns:xlink, etc.)
-            clean = clean.replace(/\s(id|class|version|xmlns:xlink|xml:space|enable-background|x|y|style)=".*?"/gi, '');
+            trimmedOutput = clean;
             
-            // 3. 長すぎる小数点のトリミング (d属性などの数値)
-            // 数値を見つけ、小数点第2位までに丸める
-            clean = clean.replace(/(\d+\.\d{3,})/g, (match) => {
-                return parseFloat(parseFloat(match).toFixed(2));
-            });
-
-            // 4. 空白の圧縮
-            clean = clean.replace(/>\s+</g, '><').trim();
-
-            trimmedCode = clean;
+            // プレビュー表示
+            previewLabel.style.display = 'none';
+            previewContainer.innerHTML = trimmedOutput;
             
-            // プレビュー更新
-            svgPreview.innerHTML = trimmedCode;
-            
-            // 統計更新
-            const originalSize = raw.length;
-            const newSize = trimmedCode.length;
-            const diff = originalSize - newSize;
-            reducedBytes.innerText = diff > 0 ? diff : 0;
-            reducedRate.innerText = originalSize > 0 ? Math.round((diff / originalSize) * 100) : 0;
+            // 統計計算
+            const diff = raw.length - clean.length;
+            redB.innerText = diff > 0 ? diff : 0;
+            redR.innerText = Math.round((diff / raw.length) * 100) || 0;
 
         } catch (e) {
-            svgPreview.innerHTML = '<span style="color:red; font-size:0.8rem">Invalid SVG Code</span>';
+            previewContainer.innerHTML = '<span style="color:red; font-size:0.7rem">Parse Error</span>';
         }
     }
 
-    function resetStats() {
-        svgPreview.innerHTML = '<span style="color: #ccc; font-weight: 800;">Preview</span>';
-        reducedBytes.innerText = '0';
-        reducedRate.innerText = '0';
-        trimmedCode = "";
+    function resetAll() {
+        previewContainer.innerHTML = '';
+        previewContainer.appendChild(previewLabel);
+        previewLabel.style.display = 'block';
+        redB.innerText = '0';
+        redR.innerText = '0';
+        trimmedOutput = "";
     }
 
     function clearAll() {
         svgInput.value = '';
-        resetStats();
+        resetAll();
         svgInput.focus();
     }
 
     async function copyResult() {
-        if (!trimmedCode) return;
+        if (!trimmedOutput) return;
         try {
-            await navigator.clipboard.writeText(trimmedCode);
+            await navigator.clipboard.writeText(trimmedOutput);
             toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 1500);
-        } catch (err) {}
+            setTimeout(() => toast.style.opacity = '0', 1200);
+        } catch (err) {
+            alert('Copy failed');
+        }
     }
 
     function showModal() { document.getElementById('modal').style.display = 'flex'; }
