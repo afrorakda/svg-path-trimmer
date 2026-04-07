@@ -17,6 +17,7 @@
             --input-bg: #fafafa;
             --radius: 15px;
             --text-gray: #666;
+            --placeholder: #bbb;
         }
 
         body {
@@ -33,51 +34,57 @@
         .container {
             width: 100%;
             max-width: 400px;
-            padding: 40px 20px;
+            padding: 30px 20px;
             box-sizing: border-box;
             text-align: center;
+            display: flex;
+            flex-direction: column;
         }
 
-        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
-        .subtitle { font-size: 0.95rem; color: var(--text-gray); font-weight: 600; margin-bottom: 30px; }
+        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -1px; }
+        .subtitle { font-size: 0.9rem; color: var(--text-gray); font-weight: 600; margin-bottom: 25px; }
 
-        /* Config Card */
-        .card {
-            background: var(--input-bg);
-            padding: 18px;
-            border-radius: var(--radius);
+        /* Top Config Swtiches */
+        .config-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
             margin-bottom: 20px;
-            border: 1px solid var(--border);
         }
-        
-        .row-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .label { font-size: 0.8rem; font-weight: 800; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        .config-item {
+            flex: 1;
+            background: var(--input-bg);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+        .config-label { font-size: 0.7rem; font-weight: 800; color: var(--text-gray); text-transform: uppercase; }
 
-        /* Unit & Bleed Toggles */
-        .toggle-group { display: flex; background: #ddd; padding: 3px; border-radius: 10px; gap: 2px; }
+        .toggle-group { display: flex; background: #ddd; padding: 2px; border-radius: 8px; width: 100%; }
         .tgl-btn {
-            border: none; background: none; padding: 4px 10px; font-size: 0.75rem; 
-            font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-gray);
+            flex: 1; border: none; background: none; padding: 4px 2px; font-size: 0.7rem; 
+            font-weight: 800; cursor: pointer; border-radius: 6px; color: var(--text-gray);
         }
         .tgl-btn.active { background: var(--main); color: #fff; }
 
-        .dpi-field {
-            width: 70px; padding: 8px; border-radius: 10px; border: 2px solid var(--border);
-            font-size: 1.1rem; font-weight: 800; text-align: center; outline: none;
-            -webkit-appearance: none; -webkit-text-fill-color: var(--main); opacity: 1 !important;
-        }
-
-        /* Input Section */
-        .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .input-group { flex: 1; position: relative; }
+        /* Main Input Area */
+        .input-card { margin-bottom: 15px; }
+        .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .input-group { flex: 1; position: relative; text-align: left; }
+        .input-sub-label { font-size: 0.75rem; font-weight: 800; color: var(--text-gray); margin-left: 5px; margin-bottom: 4px; display: block; }
         
-        input[type="text"], input[type="number"] {
+        input {
             width: 100%;
             padding: 18px 12px;
+            padding-right: 35px;
             border: 2px solid var(--border);
             border-radius: var(--radius);
             background: #fff;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--main) !important;
             box-sizing: border-box;
@@ -86,33 +93,56 @@
             -webkit-text-fill-color: var(--main) !important;
             opacity: 1 !important;
         }
-        input::placeholder { color: #ccc; -webkit-text-fill-color: #ccc; }
+        input::placeholder { color: var(--placeholder); -webkit-text-fill-color: var(--placeholder); }
 
-        .clr-x {
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-            background: var(--border); color: #fff; width: 18px; height: 18px;
-            border-radius: 50%; border: none; font-size: 12px; font-weight: 800;
-            cursor: pointer; display: none; line-height: 1;
+        .clr-btn {
+            position: absolute; right: 10px; top: 50%; transform: translateY(0%); /* Adjusted for label */
+            margin-top: 8px;
+            background: #ddd; color: #fff; width: 18px; height: 18px;
+            border-radius: 50%; border: none; font-size: 10px; font-weight: 800;
+            cursor: pointer; display: none; align-items: center; justify-content: center;
         }
-        .clr-x.active { display: block; }
+        .clr-btn.active { display: flex; }
 
-        /* Presets */
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 25px; }
+        /* Presets Area */
+        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
         .p-btn {
             background: var(--accent); border: none; padding: 12px 5px; border-radius: 12px;
             font-size: 0.85rem; font-weight: 800; color: var(--main); cursor: pointer;
         }
         .p-btn:active { transform: scale(0.95); background: var(--border); }
 
-        /* Result Area */
+        /* DPI Area (Sub-priority) */
+        .dpi-section {
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .dpi-input-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .dpi-input-group { position: relative; width: 100px; }
+        .dpi-field {
+            width: 100%; padding: 10px; border-radius: 10px; border: 2px solid var(--border);
+            font-size: 1.2rem; font-weight: 800; text-align: center;
+        }
+        .dpi-quick-row { display: flex; gap: 5px; justify-content: center; }
+        .dpi-q-btn {
+            flex: 1; border: none; background: #ddd; padding: 8px; border-radius: 8px;
+            font-size: 0.75rem; font-weight: 800; color: var(--main); cursor: pointer;
+        }
+
+        /* Result Area (Main Visual) */
         .result-box {
             background: var(--main); color: #fff; padding: 25px 15px;
-            border-radius: var(--radius); margin-top: 10px; cursor: pointer;
+            border-radius: var(--radius); margin-top: auto; cursor: pointer;
+            transition: transform 0.1s;
         }
         .result-box:active { transform: scale(0.98); }
         .res-label { font-size: 0.75rem; font-weight: 700; opacity: 0.5; margin-bottom: 8px; display: block; }
-        .res-val { font-size: 1.8rem; font-weight: 800; }
+        .res-val { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
 
+        /* Common Elements */
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--main); color: #fff; padding: 10px 20px;
@@ -120,19 +150,30 @@
             opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
         }
 
-        footer { margin-top: 50px; font-size: 11px; color: #777; line-height: 1.8; font-weight: 500; }
+        footer { margin-top: 40px; font-size: 11px; color: #777; line-height: 1.8; font-weight: 500; }
         footer a { color: inherit; text-decoration: underline; }
         .footer-btns { margin-top: 25px; }
         .kofi-btn {
             display: inline-block; background: var(--main); color: #fff;
             padding: 12px 24px; border-radius: var(--radius);
-            text-decoration: none; font-weight: bold; font-size: 14px; margin-bottom: 15px;
+            text-decoration: none; font-weight: bold; font-size: 14px; margin-bottom: 12px;
         }
         .home-btn {
             display: block; width: 65%; margin: 0 auto; background: var(--accent);
             color: var(--main); border: none; padding: 10px;
             border-radius: var(--radius); font-weight: 800; font-size: 13px; cursor: pointer;
         }
+
+        /* Modal Style */
+        #modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-content {
+            background: #fff; width: 85%; max-width: 340px; padding: 35px;
+            border-radius: var(--radius); text-align: left; position: relative;
+        }
+        .close-x { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #888; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -143,48 +184,61 @@
     <h1>Paper to Pixel</h1>
     <p class="subtitle">Resolution calculator for creators.</p>
 
-    <div class="card">
-        <div class="row-between">
-            <span class="label">Unit</span>
+    <div class="config-bar">
+        <div class="config-item">
+            <span class="config-label">Unit</span>
             <div class="toggle-group">
                 <button class="tgl-btn active" id="btn-mm" onclick="setUnit('mm')">mm</button>
                 <button class="tgl-btn" id="btn-in" onclick="setUnit('in')">inch</button>
             </div>
         </div>
-        <div class="row-between">
-            <span class="label">Bleed (+3mm)</span>
+        <div class="config-item">
+            <span class="config-label">Bleed (+3mm)</span>
             <div class="toggle-group">
                 <button class="tgl-btn active" id="btn-b0" onclick="setBleed(false)">OFF</button>
                 <button class="tgl-btn" id="btn-b1" onclick="setBleed(true)">ON</button>
             </div>
         </div>
-        <div class="row-between" style="margin-bottom: 0;">
-            <span class="label">Resolution</span>
-            <div>
-                <input type="number" id="dpi" value="350" class="dpi-field" oninput="calc()">
-                <span style="font-size: 0.8rem; font-weight: 800; margin-left: 4px;">DPI</span>
+    </div>
+
+    <div class="input-card">
+        <div class="input-row">
+            <div class="input-group">
+                <span class="input-sub-label">Width</span>
+                <input type="text" id="wIn" placeholder="Width" inputmode="decimal" oninput="upd()">
+                <button class="clr-btn" id="clr-w" onclick="cls('wIn')">×</button>
+            </div>
+            <div class="input-group">
+                <span class="input-sub-label">Height</span>
+                <input type="text" id="hIn" placeholder="Height" inputmode="decimal" oninput="upd()">
+                <button class="clr-btn" id="clr-h" onclick="cls('hIn')">×</button>
             </div>
         </div>
     </div>
 
-    <div class="input-row">
-        <div class="input-group">
-            <input type="text" id="wIn" placeholder="Width" inputmode="decimal" oninput="upd()">
-            <button class="clr-x" id="clr-w" onclick="cls('wIn')">×</button>
-        </div>
-        <div class="input-group">
-            <input type="text" id="hIn" placeholder="Height" inputmode="decimal" oninput="upd()">
-            <button class="clr-x" id="clr-h" onclick="cls('hIn')">×</button>
-        </div>
-    </div>
-
-    <div class="grid">
+    <div class="preset-grid">
         <button class="p-btn" onclick="setP(210, 297, 8.27, 11.69)">A4</button>
         <button class="p-btn" onclick="setP(148, 210, 5.83, 8.27)">A5</button>
         <button class="p-btn" onclick="setP(182, 257, 7.17, 10.12)">B5</button>
         <button class="p-btn" onclick="setP(128, 182, 5.04, 7.17)">B6</button>
         <button class="p-btn" onclick="setP(100, 148, 3.94, 5.83)">Post</button>
         <button class="p-btn" onclick="setP(91, 55, 3.58, 2.17)">Card</button>
+    </div>
+
+    <div class="dpi-section">
+        <div class="dpi-input-row">
+            <span class="config-label">Resolution</span>
+            <div class="dpi-input-group">
+                <input type="number" id="dpi" value="350" class="dpi-field" oninput="upd()">
+                <button class="clr-btn" id="clr-d" onclick="cls('dpi')" style="margin-top: 0; right: 5px;">×</button>
+            </div>
+            <span class="config-label">DPI</span>
+        </div>
+        <div class="dpi-quick-row">
+            <button class="dpi-q-btn" onclick="setD(72)">72</button>
+            <button class="dpi-q-btn" onclick="setD(350)">350</button>
+            <button class="dpi-q-btn" onclick="setD(600)">600</button>
+        </div>
     </div>
 
     <div class="result-box" onclick="cp()">
@@ -194,13 +248,23 @@
 
     <div class="footer-btns">
         <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
-        <button class="home-btn" onclick="alert('Add to Home Screen via browser menu')">Add to Home Screen</button>
+        <button class="home-btn" onclick="showM()">Add to Home Screen</button>
     </div>
 
     <footer>
         <div>No login / No tracking / No ads / Browser only</div>
         <div><a href="https://afrorakda.com/privacy/">Privacy Policy</a> / afrorakda © 2026</div>
     </footer>
+</div>
+
+<div id="modal" onclick="hideM()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-x" onclick="hideM()">×</span>
+        <h3>📱 Install</h3>
+        <p>Add to your home screen for quick access.</p>
+        <p>🍏 <strong>iPhone (Safari):</strong><br>Tap the Share button <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8'/%3E%3Cpolyline points='16 6 12 2 8 6'/%3E%3Cline x1='12' y1='2' x2='12' y2='15'/%3E%3C/svg%3E" style="vertical-align: middle;"> , then "Add to Home Screen".</p>
+        <p>🤖 <strong>Android (Chrome):</strong><br>Tap the Menu icon (⋮), then "Add to Home Screen".</p>
+    </div>
 </div>
 
 <script>
@@ -212,17 +276,29 @@
     const rEl = document.getElementById('res');
 
     function setUnit(u) {
+        // Automatic conversion to prevent massive jumps
+        let w = parseFloat(wEl.value) || 0;
+        let h = parseFloat(hEl.value) || 0;
+        if (w > 0 && h > 0) {
+            if (u === 'in' && unit === 'mm') {
+                wEl.value = (w / 25.4).toFixed(2);
+                hEl.value = (h / 25.4).toFixed(2);
+            } else if (u === 'mm' && unit === 'in') {
+                wEl.value = Math.round(w * 25.4);
+                hEl.value = Math.round(h * 25.4);
+            }
+        }
         unit = u;
         document.getElementById('btn-mm').classList.toggle('active', u==='mm');
         document.getElementById('btn-in').classList.toggle('active', u==='in');
-        calc();
+        upd();
     }
 
     function setBleed(b) {
         bleed = b;
         document.getElementById('btn-b0').classList.toggle('active', !b);
         document.getElementById('btn-b1').classList.toggle('active', b);
-        calc();
+        upd();
     }
 
     function upd() {
@@ -230,11 +306,12 @@
         hEl.value = hEl.value.replace(/[^0-9.]/g, '');
         document.getElementById('clr-w').classList.toggle('active', wEl.value !== '');
         document.getElementById('clr-h').classList.toggle('active', hEl.value !== '');
+        document.getElementById('clr-d').classList.toggle('active', dEl.value !== '');
         calc();
     }
 
-    function cls(id) { document.getElementById(id).value = ''; upd(); }
-
+    function cls(id) { document.getElementById(id).value = ''; upd(); document.getElementById(id).focus(); }
+    function setD(v) { dEl.value = v; upd(); }
     function setP(wm, hm, wi, hi) {
         wEl.value = (unit === 'mm') ? wm : wi;
         hEl.value = (unit === 'mm') ? hm : hi;
@@ -247,13 +324,14 @@
         const d = parseFloat(dEl.value) || 0;
 
         if (w > 0 && h > 0 && d > 0) {
+            let cw = w;
+            let ch = h;
             if (bleed) {
-                // Bleed +3mm on each side = +6mm total or +0.25 inch
-                w += (unit === 'mm') ? 6 : 0.25;
-                h += (unit === 'mm') ? 6 : 0.25;
+                cw += (unit === 'mm') ? 6 : 0.25;
+                ch += (unit === 'mm') ? 6 : 0.25;
             }
-            const pw = (unit === 'mm') ? Math.round((w * d) / 25.4) : Math.round(w * d);
-            const ph = (unit === 'mm') ? Math.round((h * d) / 25.4) : Math.round(h * d);
+            const pw = (unit === 'mm') ? Math.round((cw * d) / 25.4) : Math.round(cw * d);
+            const ph = (unit === 'mm') ? Math.round((ch * d) / 25.4) : Math.round(ch * d);
             rEl.innerText = pw + ' × ' + ph + ' px';
         } else {
             rEl.innerText = '0 × 0 px';
@@ -267,6 +345,9 @@
         t.style.opacity = '1';
         setTimeout(() => t.style.opacity = '0', 1500);
     }
+
+    function showM() { document.getElementById('modal').style.display = 'flex'; }
+    function hideM() { document.getElementById('modal').style.display = 'none'; }
 </script>
 
 </body>
