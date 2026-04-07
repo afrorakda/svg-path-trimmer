@@ -17,7 +17,6 @@
             --input-bg: #fafafa;
             --radius: 15px;
             --text-gray: #666;
-            --placeholder: #bbb;
         }
 
         body {
@@ -42,10 +41,10 @@
         h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
         .subtitle { font-size: 1rem; color: var(--text-gray); font-weight: 600; margin-bottom: 30px; }
 
-        /* DPI Config Area */
+        /* DPI Section */
         .config-box {
             background: var(--input-bg);
-            padding: 15px;
+            padding: 20px;
             border-radius: var(--radius);
             margin-bottom: 25px;
             border: 1px solid var(--border);
@@ -54,32 +53,32 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         .label { font-size: 0.85rem; font-weight: 800; color: var(--text-gray); text-transform: uppercase; }
         
-        .dpi-input-wrap { display: flex; align-items: center; gap: 8px; }
-        .dpi-input {
-            width: 80px; padding: 10px; font-size: 1.2rem; font-weight: 800;
-            text-align: center; border: 2px solid var(--border); border-radius: 10px;
-            background: #fff; color: var(--main) !important;
+        .dpi-input-wrapper { display: flex; align-items: center; gap: 10px; }
+        .dpi-field {
+            width: 85px; padding: 12px; border-radius: 12px; border: 2px solid var(--border);
+            background: #fff; font-size: 1.3rem; font-weight: 800; text-align: center;
+            color: var(--main) !important; outline: none;
             -webkit-appearance: none; -webkit-text-fill-color: var(--main); opacity: 1 !important;
         }
-        .unit { font-size: 0.9rem; font-weight: 800; color: var(--text-gray); }
+        .unit-label { font-size: 1rem; font-weight: 800; color: var(--text-gray); }
 
-        /* Input Fields */
-        .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        /* Input Rows */
+        .input-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .input-group { flex: 1; position: relative; text-align: left; }
-        .input-label { font-size: 0.8rem; font-weight: 800; color: var(--main); margin-left: 5px; margin-bottom: 6px; display: block; }
+        .input-label { font-size: 0.85rem; font-weight: 800; color: var(--main); margin-bottom: 8px; display: block; margin-left: 5px; }
         
         input[type="text"], input[type="number"] {
             width: 100%;
-            padding: 18px 12px;
-            padding-right: 35px;
+            padding: 20px 15px;
+            padding-right: 40px;
             border: 2px solid var(--border);
             border-radius: var(--radius);
             background: var(--input-bg);
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--main) !important;
             box-sizing: border-box;
@@ -88,62 +87,37 @@
             -webkit-text-fill-color: var(--main) !important;
             opacity: 1 !important;
         }
-        input::placeholder { color: var(--placeholder); -webkit-text-fill-color: var(--placeholder); }
+        input::placeholder { color: #bbb; -webkit-text-fill-color: #bbb; }
 
-        .clear-btn {
-            position: absolute;
-            right: 8px;
-            bottom: 13px;
-            background: none;
-            border: none;
-            color: var(--placeholder);
-            font-size: 1.4rem;
-            font-weight: 800;
-            cursor: pointer;
-            padding: 5px;
-            display: none;
-            z-index: 2;
+        .clr-btn {
+            position: absolute; right: 10px; bottom: 15px;
+            background: none; border: none; color: #ccc;
+            font-size: 1.5rem; font-weight: 800; cursor: pointer;
+            padding: 5px; display: none; z-index: 2;
         }
-        .clear-btn.active { display: block; }
+        .clr-btn.active { display: block; }
 
-        /* Grid Buttons */
-        .preset-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 25px;
+        /* Preset Buttons */
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .p-btn {
+            background: var(--accent); border: none; padding: 12px; border-radius: 12px;
+            font-size: 0.9rem; font-weight: 800; color: var(--main); cursor: pointer;
         }
-        .preset-btn {
-            background: var(--accent);
-            border: none;
-            padding: 12px 5px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 800;
-            cursor: pointer;
-            color: var(--main);
-            transition: transform 0.1s;
-        }
-        .preset-btn:active { transform: scale(0.95); background: var(--border); }
+        .p-btn:active { transform: scale(0.95); opacity: 0.8; }
 
-        /* Result Area */
-        .result-box {
-            background: var(--main);
-            color: #fff;
-            padding: 25px;
-            border-radius: var(--radius);
-            margin-top: 10px;
-            cursor: pointer;
-            transition: transform 0.1s;
+        /* Result Display */
+        .res-box {
+            background: var(--main); color: #fff; padding: 30px 20px;
+            border-radius: var(--radius); margin-top: 10px; cursor: pointer;
         }
-        .result-box:active { transform: scale(0.98); }
-        .result-label { font-size: 0.8rem; font-weight: 700; opacity: 0.6; margin-bottom: 8px; display: block; }
-        .result-val { font-size: 1.8rem; font-weight: 800; }
+        .res-box:active { transform: scale(0.98); }
+        .res-label { font-size: 0.8rem; font-weight: 700; opacity: 0.6; margin-bottom: 10px; display: block; }
+        .res-val { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
 
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--main); color: #fff;
-            padding: 12px 24px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;
+            background: var(--main); color: #fff; padding: 12px 24px;
+            border-radius: 20px; font-size: 0.9rem; font-weight: 700;
             opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
         }
 
@@ -151,13 +125,13 @@
         footer { margin-top: 60px; font-size: 12px; color: #777; line-height: 1.8; font-weight: 500; }
         footer a { color: inherit; text-decoration: underline; }
         .footer-btns { margin-top: 30px; }
-        .kofi-btn {
+        .kofi-link {
             display: inline-block; background: var(--main); color: #fff;
             padding: 14px 28px; border-radius: var(--radius);
             text-decoration: none; font-weight: bold; font-size: 15px; margin-bottom: 15px;
         }
-        .home-btn {
-            display: block; width: 70%; margin: 0 auto; background: var(--accent);
+        .install-btn {
+            display: block; width: 75%; margin: 0 auto; background: var(--accent);
             color: var(--main); border: none; padding: 12px;
             border-radius: var(--radius); font-weight: 800; font-size: 14px; cursor: pointer;
         }
@@ -184,48 +158,48 @@
     <div class="config-box">
         <div class="config-row">
             <span class="label">Resolution</span>
-            <div class="dpi-input-wrap">
-                <input type="number" id="dpiInput" value="350" class="dpi-input" oninput="calc()">
-                <span class="unit">DPI</span>
+            <div class="dpi-input-wrapper">
+                <input type="number" id="dpi" value="350" class="dpi-field" oninput="run()">
+                <span class="unit-label">DPI</span>
             </div>
         </div>
-        <div class="preset-grid" style="margin-bottom: 0;">
-            <button class="preset-btn" onclick="setDPI(72)">72</button>
-            <button class="preset-btn" onclick="setDPI(350)">350</button>
-            <button class="preset-btn" onclick="setDPI(600)">600</button>
+        <div class="grid-3" style="margin-bottom: 0;">
+            <button class="p-btn" onclick="setD(72)">72</button>
+            <button class="p-btn" onclick="setD(350)">350</button>
+            <button class="p-btn" onclick="setD(600)">600</button>
         </div>
     </div>
 
     <div class="input-row">
         <div class="input-group">
             <span class="input-label">Width (mm)</span>
-            <input type="text" id="wInput" placeholder="#bbb" inputmode="decimal" oninput="handleInput()">
-            <button class="clear-btn" id="clr-w" onclick="clearInput('wInput')">×</button>
+            <input type="text" id="wIn" placeholder="#bbb" inputmode="decimal" oninput="upd()">
+            <button class="clr-btn" id="clr-w" onclick="cls('wIn')">×</button>
         </div>
         <div class="input-group">
             <span class="input-label">Height (mm)</span>
-            <input type="text" id="hInput" placeholder="#bbb" inputmode="decimal" oninput="handleInput()">
-            <button class="clear-btn" id="clr-h" onclick="clearInput('hInput')">×</button>
+            <input type="text" id="hIn" placeholder="#bbb" inputmode="decimal" oninput="upd()">
+            <button class="clr-btn" id="clr-h" onclick="cls('hIn')">×</button>
         </div>
     </div>
 
-    <div class="preset-grid">
-        <button class="preset-btn" onclick="setPaper(210, 297)">A4</button>
-        <button class="preset-btn" onclick="setPaper(148, 210)">A5</button>
-        <button class="preset-btn" onclick="setPaper(182, 257)">B5</button>
-        <button class="preset-btn" onclick="setPaper(128, 182)">B6</button>
-        <button class="preset-btn" onclick="setPaper(100, 148)">Postcard</button>
-        <button class="preset-btn" onclick="setPaper(91, 55)">Card</button>
+    <div class="grid-3">
+        <button class="p-btn" onclick="setP(210, 297)">A4</button>
+        <button class="p-btn" onclick="setP(148, 210)">A5</button>
+        <button class="p-btn" onclick="setP(182, 257)">B5</button>
+        <button class="p-btn" onclick="setP(128, 182)">B6</button>
+        <button class="p-btn" onclick="setP(100, 148)">Post</button>
+        <button class="p-btn" onclick="setP(91, 55)">Card</button>
     </div>
 
-    <div class="result-box" onclick="copyResult()">
-        <span class="result-label">Required Pixels (Tap to copy)</span>
-        <div class="result-val" id="resultDisplay">0 × 0 px</div>
+    <div class="res-box" onclick="cp()">
+        <span class="res-label">Required Pixels (Tap to copy)</span>
+        <div class="res-val" id="res">0 × 0 px</div>
     </div>
 
     <div class="footer-btns">
-        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
-        <button class="home-btn" onclick="showModal()">Add to Home Screen</button>
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-link">☕️buy me a coffee</a>
+        <button class="install-btn" onclick="showM()">Add to Home Screen</button>
     </div>
 
     <footer>
@@ -234,80 +208,64 @@
     </footer>
 </div>
 
-<div id="modal" onclick="hideModal()">
+<div id="modal" onclick="hideM()">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close-x" onclick="hideModal()">×</span>
+        <span class="close-x" onclick="hideM()">×</span>
         <h3>📱 Install</h3>
-        <p>Add to your home screen.</p>
+        <p>Add to home screen.</p>
         <p>🍏 <strong>iPhone (Safari):</strong><br>Tap Share, then Add to Home Screen.</p>
         <p>🤖 <strong>Android (Chrome):</strong><br>Tap Menu (⋮), then Add to Home Screen.</p>
     </div>
 </div>
 
 <script>
-    const wInput = document.getElementById('wInput');
-    const hInput = document.getElementById('hInput');
-    const dpiInput = document.getElementById('dpiInput');
-    const resultDisplay = document.getElementById('resultDisplay');
-    const toast = document.getElementById('toast');
+    const wEl = document.getElementById('wIn');
+    const hEl = document.getElementById('hIn');
+    const dEl = document.getElementById('dpi');
+    const rEl = document.getElementById('res');
+    const tEl = document.getElementById('toast');
 
-    function handleInput() {
-        wInput.value = wInput.value.replace(/[^0-9.]/g, '');
-        hInput.value = hInput.value.replace(/[^0-9.]/g, '');
-        updateClearButtons();
-        calc();
+    function upd() {
+        wEl.value = wEl.value.replace(/[^0-9.]/g, '');
+        hEl.value = hEl.value.replace(/[^0-9.]/g, '');
+        document.getElementById('clr-w').classList.toggle('active', wEl.value !== '');
+        document.getElementById('clr-h').classList.toggle('active', hEl.value !== '');
+        run();
     }
 
-    function updateClearButtons() {
-        document.getElementById('clr-w').classList.toggle('active', wInput.value !== '');
-        document.getElementById('clr-h').classList.toggle('active', hInput.value !== '');
-    }
-
-    function clearInput(id) {
+    function cls(id) {
         document.getElementById(id).value = '';
-        updateClearButtons();
-        calc();
+        upd();
         document.getElementById(id).focus();
     }
 
-    function setPaper(w, h) {
-        wInput.value = w;
-        hInput.value = h;
-        updateClearButtons();
-        calc();
-    }
+    function setP(w, h) { wEl.value = w; hEl.value = h; upd(); }
+    function setD(v) { dEl.value = v; run(); }
 
-    function setDPI(val) {
-        dpiInput.value = val;
-        calc();
-    }
-
-    function calc() {
-        const w = parseFloat(wInput.value) || 0;
-        const h = parseFloat(hInput.value) || 0;
-        const dpi = parseFloat(dpiInput.value) || 0;
-
-        if (w > 0 && h > 0 && dpi > 0) {
-            const pxW = Math.round((w * dpi) / 25.4);
-            const pxH = Math.round((h * dpi) / 25.4);
-            resultDisplay.innerText = pxW + ' × ' + pxH + ' px';
+    function run() {
+        const w = parseFloat(wEl.value) || 0;
+        const h = parseFloat(hEl.value) || 0;
+        const d = parseFloat(dEl.value) || 0;
+        if (w > 0 && h > 0 && d > 0) {
+            const pw = Math.round((w * d) / 25.4);
+            const ph = Math.round((h * d) / 25.4);
+            rEl.innerText = pw + ' × ' + ph + ' px';
         } else {
-            resultDisplay.innerText = '0 × 0 px';
+            rEl.innerText = '0 × 0 px';
         }
     }
 
-    async function copyResult() {
-        const text = resultDisplay.innerText;
-        if (text === "0 × 0 px") return;
+    async function cp() {
+        if (rEl.innerText === '0 × 0 px') return;
         try {
-            await navigator.clipboard.writeText(text.replace(' px', ''));
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 1500);
-        } catch (err) {}
+            await navigator.clipboard.writeText(rEl.innerText.replace(' px', ''));
+            tEl.style.opacity = '1';
+            setTimeout(() => tEl.style.opacity = '0', 1500);
+        } catch (e) {}
     }
 
-    function showModal() { document.getElementById('modal').style.display = 'flex'; }
-    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+    function showM() { document.getElementById('modal').style.display = 'flex'; }
+    function hideM() { document.getElementById('modal').style.display = 'none'; }
 </script>
 
 </body>
