@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SVG Path Trimmer</title>
+    <title>SVG Trimmer</title>
     
     <link rel="icon" href="image_90.png">
     <link rel="apple-touch-icon" href="image_90.png">
@@ -13,12 +13,10 @@
             --main: #333;
             --bg: #fff;
             --accent: #ccc;
-            --input-bg: #fafafa;
             --radius: 15px;
-            --text-gray: #666;
         }
 
-        /* iOSでの誤動作を徹底防止 */
+        /* iOS Safari徹底ガード */
         * {
             -webkit-user-select: none;
             user-select: none;
@@ -27,215 +25,175 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 入力エリアだけは選択可能にする */
-        textarea {
+        input, textarea {
             -webkit-user-select: text !important;
             user-select: text !important;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
+            background-color: #f0f0f0;
             color: var(--main);
             margin: 0;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
+            flex-direction: column;
         }
 
-        .container {
-            width: 100%;
-            max-width: 420px;
-            padding: 40px 20px;
-            box-sizing: border-box;
-            text-align: center;
-            position: relative;
-            z-index: 5;
-        }
-
-        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -1px; }
-        .subtitle { font-size: 0.9rem; color: var(--text-gray); font-weight: 600; margin-bottom: 25px; }
-
-        .input-group { position: relative; text-align: left; margin-bottom: 20px; }
-        .input-label { font-size: 0.85rem; font-weight: 800; color: var(--main); margin-bottom: 8px; display: block; padding-left: 5px; }
-        
-        textarea {
-            width: 100%;
-            height: 140px;
-            padding: 15px;
-            border: 2px solid var(--accent);
-            border-radius: var(--radius);
-            background: var(--input-bg);
-            font-size: 0.8rem;
-            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-            color: var(--main);
-            outline: none;
-            resize: none;
-            -webkit-appearance: none;
-            pointer-events: auto; /* 確実に触れるように */
-        }
-        textarea::placeholder { color: #bbb; }
-
-        .clr-btn {
-            position: absolute; right: 10px; bottom: 10px;
-            background: #fff; border: 1px solid var(--accent); color: var(--main);
-            font-size: 1rem; font-weight: 800; cursor: pointer;
-            padding: 5px 12px; border-radius: 8px;
-            pointer-events: auto;
-            touch-action: manipulation;
-        }
-
-        .stats-bar {
-            background: var(--main);
-            color: #fff;
-            padding: 12px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-around;
-            font-size: 0.75rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-        }
-
-        .preview-area {
-            width: 100%;
-            aspect-ratio: 1/1;
-            background: #fff;
-            border: 2px solid #eee;
-            border-radius: var(--radius);
+        /* 背面のプレビューエリア */
+        #preview-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 25px;
-            padding: 20px;
-            overflow: hidden;
+            padding: 40px;
+            background-color: #fff;
             background-image: 
-                linear-gradient(45deg, #f9f9f9 25%, transparent 25%), 
-                linear-gradient(-45deg, #f9f9f9 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #f9f9f9 75%), 
-                linear-gradient(-45deg, transparent 75%, #f9f9f9 75%);
+                linear-gradient(45deg, #f8f8f8 25%, transparent 25%), 
+                linear-gradient(-45deg, #f8f8f8 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #f8f8f8 75%), 
+                linear-gradient(-45deg, transparent 75%, #f8f8f8 75%);
             background-size: 20px 20px;
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
-        .preview-area svg { max-width: 100%; max-height: 100%; object-fit: contain; }
+        #preview-bg svg { max-width: 80%; max-height: 50%; object-fit: contain; }
 
-        .copy-btn {
-            width: 100%;
-            background: var(--main);
-            color: #fff;
-            padding: 18px;
-            border-radius: var(--radius);
-            border: none;
-            font-size: 1rem;
-            font-weight: 800;
-            cursor: pointer;
-            pointer-events: auto;
-            touch-action: manipulation;
+        /* ボトム・コントロールユニット */
+        .bottom-ui {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            z-index: 10;
+            padding: 10px 15px calc(15px + env(safe-area-inset-bottom));
+            background: linear-gradient(to top, rgba(240,240,240,1) 85%, rgba(240,240,240,0));
+            pointer-events: none;
         }
-        .copy-btn:active { opacity: 0.8; transform: scale(0.98); }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 15px;
+            border-radius: var(--radius);
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--accent);
+            pointer-events: auto;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .header-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+        h1 { font-size: 1rem; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
+        .stats { font-size: 0.7rem; color: #888; font-weight: 700; margin-left: auto; }
+
+        textarea {
+            width: 100%; height: 80px; padding: 10px;
+            border: 2px solid var(--accent); border-radius: 10px;
+            font-size: 0.75rem; font-family: ui-monospace, monospace;
+            background: #fafafa; outline: none; resize: none; margin-bottom: 10px;
+            pointer-events: auto;
+        }
+
+        .action-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .btn {
+            flex: 1; height: 46px; border-radius: 10px; border: none;
+            font-weight: 800; cursor: pointer; transition: transform 0.1s;
+            touch-action: manipulation; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-main { background: var(--main); color: #fff; font-size: 0.95rem; }
+        .btn-sub { background: #eee; color: var(--main); font-size: 0.8rem; }
+        .btn:active { transform: scale(0.96); opacity: 0.8; }
 
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--main); color: #fff;
-            padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;
+            background: var(--main); color: #fff; padding: 10px 20px;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 800;
             opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
         }
 
-        footer { margin-top: 50px; font-size: 11px; color: #999; line-height: 1.8; }
-        footer a { color: inherit; text-decoration: underline; }
-        
-        .footer-btns { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        .kofi-btn {
-            display: inline-block; background: var(--main); color: #fff;
-            padding: 12px 24px; border-radius: var(--radius);
-            text-decoration: none; font-weight: bold; font-size: 14px;
-            pointer-events: auto; touch-action: manipulation;
-        }
-        .home-btn {
-            width: 70%; background: #eee;
-            color: var(--main); border: none; padding: 10px;
-            border-radius: var(--radius); font-weight: 800; font-size: 13px; cursor: pointer;
-            pointer-events: auto; touch-action: manipulation;
-        }
+        .sub-links { display: flex; gap: 8px; margin-top: 10px; max-width: 420px; margin-left: auto; margin-right: auto; pointer-events: auto; }
+        .link-btn { flex: 1; background: rgba(255,255,255,0.8); border: 1px solid var(--accent); padding: 10px; border-radius: 10px; text-decoration: none; color: var(--main); font-size: 10px; font-weight: 700; text-align: center; }
+
+        footer { margin-top: 10px; text-align: center; font-size: 9px; color: #aaa; font-weight: 600; pointer-events: auto; }
 
         /* モーダル */
         #modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 200;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
             pointer-events: auto;
         }
+        #modal.active { display: flex; }
         .modal-content {
-            background: #fff; width: 85%; max-width: 340px; padding: 30px;
-            border-radius: var(--radius); text-align: left; position: relative;
+            background: #fff; width: 85%; max-width: 320px; padding: 30px;
+            border-radius: var(--radius); position: relative;
         }
         .close-x { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #888; cursor: pointer; }
     </style>
 </head>
 <body>
 
+<div id="preview-bg">
+    <div id="svg-display" style="color:#ccc; font-weight:900;">PREVIEW</div>
+</div>
+
 <div id="toast">Copied!</div>
 
-<div class="container">
-    <h1>SVG Trimmer</h1>
-    <p class="subtitle">Minimalize your SVG code instantly.</p>
+<div class="bottom-ui">
+    <div class="control-panel">
+        <div class="header-row">
+            <h1>SVG Trimmer</h1>
+            <div class="stats" id="stat-text">Reduced: 0%</div>
+        </div>
 
-    <div class="input-group">
-        <span class="input-label">Paste SVG Code</span>
-        <textarea id="svgInput" placeholder='<svg ...> ... </svg>' oninput="processSVG()"></textarea>
-        <button class="clr-btn" onclick="clearAll()">×</button>
+        <textarea id="svgInput" placeholder="Paste SVG here..." spellcheck="false"></textarea>
+
+        <div class="action-row">
+            <button id="clearBtn" class="btn btn-sub" style="flex:0.3">×</button>
+            <button id="copyBtn" class="btn btn-main">Copy Trimmed SVG</button>
+        </div>
     </div>
 
-    <div class="stats-bar">
-        <span>Reduced: <span id="redB">0</span> B</span>
-        <span>Rate: <span id="redR">0</span> %</span>
-    </div>
-
-    <div class="preview-area" id="previewContainer">
-        <span id="previewLabel" style="color: #ccc; font-weight: 800;">Preview</span>
-    </div>
-
-    <button class="copy-btn" onclick="copyResult()">Copy Trimmed SVG</button>
-
-    <div class="footer-btns">
-        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
-        <button class="home-btn" onclick="showModal()">Add to Home Screen</button>
+    <div class="sub-links">
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="link-btn">☕️ buy me a coffee</a>
+        <button id="modalBtn" class="link-btn">📱 Add to Home</button>
     </div>
 
     <footer>
-        <div>No login / No tracking / No ads / Browser only</div>
-        <div><a href="https://afrorakda.com/privacy/">Privacy Policy</a> / afrorakda © 2026</div>
+        No login / No tracking / No ads / Browser only<br>
+        <a href="https://afrorakda.com/privacy/" style="color:inherit;">Privacy Policy</a> / afrorakda © 2026
     </footer>
 </div>
 
-<div id="modal" onclick="hideModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close-x" onclick="hideModal()">×</span>
-        <h3>📱 Install</h3>
-        <p>Add to your home screen.</p>
-        <p>🍏 <strong>iPhone (Safari):</strong><br>Tap Share, then Add to Home Screen.</p>
-        <p>🤖 <strong>Android (Chrome):</strong><br>Tap Menu (⋮), then Add to Home Screen.</p>
+<div id="modal">
+    <div class="modal-content">
+        <span class="close-x" id="closeModal">×</span>
+        <h3 style="margin-top:0">📱 Install</h3>
+        <p style="font-size:0.9rem">Add to your home screen.</p>
+        <p style="font-size:0.8rem">🍏 <strong>iPhone:</strong> Tap Share, then Add to Home Screen.</p>
+        <p style="font-size:0.8rem">🤖 <strong>Android:</strong> Tap Menu (⋮), then Add to Home Screen.</p>
     </div>
 </div>
 
 <script>
-    const svgInput = document.getElementById('svgInput');
-    const previewContainer = document.getElementById('previewContainer');
-    const previewLabel = document.getElementById('previewLabel');
-    const redB = document.getElementById('redB');
-    const redR = document.getElementById('redR');
+    const input = document.getElementById('svgInput');
+    const display = document.getElementById('svg-display');
+    const statText = id => document.getElementById(id);
     const toast = document.getElementById('toast');
     let trimmedOutput = "";
 
-    function processSVG() {
-        const raw = svgInput.value.trim();
+    // 処理ロジック
+    const processSVG = () => {
+        const raw = input.value.trim();
         if (!raw) {
-            resetAll();
+            display.innerHTML = "PREVIEW";
+            statText('stat-text').innerText = "Reduced: 0%";
+            trimmedOutput = "";
             return;
         }
 
         try {
-            // クリーニング開始
             let clean = raw
                 .replace(/<\?xml.*?\?>/gi, '')
                 .replace(/<!DOCTYPE.*?>/gi, '')
@@ -246,49 +204,45 @@
                 .trim();
 
             trimmedOutput = clean;
+            display.innerHTML = trimmedOutput;
             
-            // プレビュー表示
-            previewLabel.style.display = 'none';
-            previewContainer.innerHTML = trimmedOutput;
-            
-            // 統計計算
-            const diff = raw.length - clean.length;
-            redB.innerText = diff > 0 ? diff : 0;
-            redR.innerText = Math.round((diff / raw.length) * 100) || 0;
-
+            const rate = Math.round(((raw.length - clean.length) / raw.length) * 100);
+            statText('stat-text').innerText = `Reduced: ${rate > 0 ? rate : 0}%`;
         } catch (e) {
-            previewContainer.innerHTML = '<span style="color:red; font-size:0.7rem">Parse Error</span>';
+            display.innerHTML = '<span style="color:red">Error</span>';
         }
-    }
+    };
 
-    function resetAll() {
-        previewContainer.innerHTML = '';
-        previewContainer.appendChild(previewLabel);
-        previewLabel.style.display = 'block';
-        redB.innerText = '0';
-        redR.innerText = '0';
-        trimmedOutput = "";
-    }
+    // イベント登録
+    input.addEventListener('input', processSVG);
 
-    function clearAll() {
-        svgInput.value = '';
-        resetAll();
-        svgInput.focus();
-    }
+    document.getElementById('clearBtn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        input.value = '';
+        processSVG();
+        input.focus();
+    });
 
-    async function copyResult() {
+    document.getElementById('copyBtn').addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        document.activeElement.blur(); // フォーカス強制解除
         if (!trimmedOutput) return;
         try {
             await navigator.clipboard.writeText(trimmedOutput);
             toast.style.opacity = '1';
             setTimeout(() => toast.style.opacity = '0', 1200);
-        } catch (err) {
-            alert('Copy failed');
-        }
-    }
+        } catch (err) {}
+    });
 
-    function showModal() { document.getElementById('modal').style.display = 'flex'; }
-    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+    // モーダル制御
+    const modal = document.getElementById('modal');
+    document.getElementById('modalBtn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        modal.classList.add('active');
+    });
+    document.getElementById('closeModal').addEventListener('touchstart', () => modal.classList.remove('active'));
+    modal.addEventListener('touchstart', (e) => { if(e.target === modal) modal.classList.remove('active'); });
+
 </script>
 
 </body>
