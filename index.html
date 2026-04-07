@@ -3,67 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SVG Trimmer</title>
-</head>
-<body style="background:#fff; font-family:sans-serif; margin:0; padding:40px 20px; text-align:center; color:#333;">
-
-    <h1 style="font-size:1.5rem; font-weight:900; margin-bottom:0;">SVG Trimmer</h1>
-    <p style="font-size:0.8rem; color:#888; margin-bottom:30px;">Paste to Shave</p>
+    <title>Paper to Pixel - Fridge Combo</title>
     
-    <div style="text-align:left; font-size:11px; font-weight:bold; color:#aaa; margin-bottom:5px;">INPUT</div>
-    <textarea id="I" style="width:100%; height:120px; border:2px solid #eee; border-radius:15px; padding:15px; font-size:16px; background:#fafafa; outline:none; margin-bottom:20px;" 
-        placeholder="Paste SVG here..." oninput="s()"></textarea>
+    <link rel="icon" href="image_90.png">
+    <link rel="apple-touch-icon" href="image_90.png">
 
-    <div id="L" style="background:#f0f0f0; padding:15px; border-radius:15px; font-weight:bold; font-size:0.9rem; margin-bottom:20px;">Reduced: --- %</div>
+    <style>
+        :root {
+            --main: #333;
+            --bg: #fff;
+            --accent: #eee;
+            --border: #ccc;
+            --input-bg: #fafafa;
+            --radius: 15px;
+            --text-gray: #666;
+        }
 
-    <div style="text-align:left; font-size:11px; font-weight:bold; color:#aaa; margin-bottom:5px;">RESULT (TAP TO SELECT)</div>
-    <textarea id="O" style="width:100%; height:120px; border:2px dashed #ccc; border-radius:15px; padding:15px; font-size:14px; background:#fff; outline:none;" 
-        readonly onclick="this.select()"></textarea>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
 
-    <div style="margin-top:30px; padding:15px; background:#eee; border-radius:15px; font-weight:bold; font-size:0.8rem;" 
-        onclick="alert('iPhone: Share > Add to Home')">
-        📱 Add to Home Screen
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
+        .subtitle { font-size: 1rem; color: var(--text-gray); font-weight: 600; margin-bottom: 30px; }
+
+        /* DPI Config */
+        .config-box {
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        .config-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .config-row:last-child { margin-bottom: 0; }
+        .label { font-size: 0.85rem; font-weight: 800; color: var(--text-gray); text-transform: uppercase; }
+        
+        .dpi-input-group { display: flex; align-items: center; gap: 10px; }
+        .dpi-val { font-size: 1.4rem; font-weight: 800; min-width: 60px; text-align: right; }
+        .unit { font-size: 0.9rem; font-weight: 800; color: var(--text-gray); margin-left: 4px; }
+
+        /* Input Styles */
+        .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .input-group { flex: 1; position: relative; text-align: left; }
+        .input-label { font-size: 0.8rem; font-weight: 800; color: var(--main); margin-left: 5px; margin-bottom: 6px; display: block; }
+        
+        input {
+            width: 100%;
+            padding: 18px 12px;
+            padding-right: 35px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--input-bg);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--main) !important;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-appearance: none;
+            -webkit-text-fill-color: var(--main) !important;
+            opacity: 1 !important;
+        }
+        input::placeholder { color: #bbb; -webkit-text-fill-color: #bbb; }
+
+        .clear-btn {
+            position: absolute;
+            right: 8px;
+            bottom: 13px;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1.4rem;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 5px;
+            display: none;
+            z-index: 2;
+        }
+        .clear-btn.active { display: block; }
+
+        /* Preset Buttons */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+        .preset-btn {
+            background: var(--accent);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            color: var(--main);
+        }
+        .preset-btn:active { opacity: 0.7; transform: scale(0.95); }
+
+        /* Result Area */
+        .result-box {
+            background: var(--main);
+            color: #fff;
+            padding: 25px;
+            border-radius: var(--radius);
+            margin-top: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        .result-box:active { transform: scale(0.98); }
+        .result-label { font-size: 0.8rem; font-weight: 700; opacity: 0.7; margin-bottom: 8px; display: block; }
+        .result-val { font-size: 1.8rem; font-weight: 800; word-break: break-all; }
+
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--main); color: #fff;
+            padding: 12px 24px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
+        }
+
+        /* Common Footer & Modal */
+        footer { margin-top: 60px; font-size: 12px; color: #777; line-height: 1.8; font-weight: 500; }
+        footer a { color: inherit; text-decoration: underline; }
+        .footer-btns { margin-top: 30px; }
+        .kofi-btn {
+            display: inline-block; background: var(--main); color: #fff;
+            padding: 14px 28px; border-radius: var(--radius);
+            text-decoration: none; font-weight: bold; font-size: 15px; margin-bottom: 15px;
+        }
+        .home-btn {
+            display: block; width: 70%; margin: 0 auto; background: var(--accent);
+            color: var(--main); border: none; padding: 12px;
+            border-radius: var(--radius); font-weight: 800; font-size: 14px; cursor: pointer;
+        }
+
+        #modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-content {
+            background: #fff; width: 85%; max-width: 340px; padding: 35px;
+            border-radius: var(--radius); text-align: left; position: relative;
+        }
+        .close-x { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #888; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="toast">Copied!</div>
+
+<div class="container">
+    <h1>Paper to Pixel</h1>
+    <p class="subtitle">Resolution calculator for creators.</p>
+
+    <div class="config-box">
+        <div class="config-row">
+            <span class="label">Resolution</span>
+            <div class="dpi-input-group">
+                <input type="number" id="dpiInput" value="350" style="width: 80px; padding: 8px; font-size: 1.1rem; text-align: center;" oninput="calc()">
+                <span class="unit">DPI</span>
+            </div>
+        </div>
+        <div class="preset-grid" style="margin-top: 10px; margin-bottom: 0;">
+            <button class="preset-btn" onclick="setDPI(72)">72</button>
+            <button class="preset-btn" onclick="setDPI(350)">350</button>
+            <button class="preset-btn" onclick="setDPI(600)">600</button>
+        </div>
     </div>
 
-    <footer style="margin-top:50px; font-size:10px; color:#bbb;">
-        No login / No tracking / No ads / Browser only<br>
-        afrorakda &copy; 2026
+    <div class="input-row">
+        <div class="input-group">
+            <span class="input-label">Width (mm)</span>
+            <input type="text" id="wInput" placeholder="210" inputmode="decimal" oninput="handleInput()">
+            <button class="clear-btn" id="clr-w" onclick="clearInput('wInput')">×</button>
+        </div>
+        <div class="input-group">
+            <span class="input-label">Height (mm)</span>
+            <input type="text" id="hInput" placeholder="297" inputmode="decimal" oninput="handleInput()">
+            <button class="clear-btn" id="clr-h" onclick="clearInput('hInput')">×</button>
+        </div>
+    </div>
+
+    <div class="preset-grid">
+        <button class="preset-btn" onclick="setPaper(210, 297)">A4</button>
+        <button class="preset-btn" onclick="setPaper(148, 210)">A5</button>
+        <button class="preset-btn" onclick="setPaper(182, 257)">B5</button>
+        <button class="preset-btn" onclick="setPaper(128, 182)">B6</button>
+        <button class="preset-btn" onclick="setPaper(100, 148)">Postcard</button>
+        <button class="preset-btn" onclick="setPaper(91, 55)">Business Card</button>
+    </div>
+
+    <div class="result-box" onclick="copyResult()">
+        <span class="result-label">Required Pixels (Tap to copy)</span>
+        <div class="result-val" id="resultDisplay">0 × 0 px</div>
+    </div>
+
+    <div class="footer-btns">
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
+        <button class="home-btn" onclick="showModal()">Add to Home Screen</button>
+    </div>
+
+    <footer>
+        <div>No login / No tracking / No ads / Browser only</div>
+        <div><a href="https://afrorakda.com/privacy/">Privacy Policy</a> / afrorakda © 2026</div>
     </footer>
+</div>
 
-    <script>
-        function s() {
-            var i = document.getElementById('I');
-            var o = document.getElementById('O');
-            var l = document.getElementById('L');
-            var v = i.value.trim();
+<div id="modal" onclick="hideModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-x" onclick="hideModal()">×</span>
+        <h3>📱 Install</h3>
+        <p>Add to your home screen.</p>
+        <p>🍏 <strong>iPhone (Safari):</strong><br>Tap Share, then Add to Home Screen.</p>
+        <p>🤖 <strong>Android (Chrome):</strong><br>Tap Menu (⋮), then Add to Home Screen.</p>
+    </div>
+</div>
 
-            if(!v) { o.value=""; l.innerText="Reduced: --- %"; return; }
+<script>
+    const wInput = document.getElementById('wInput');
+    const hInput = document.getElementById('hInput');
+    const dpiInput = document.getElementById('dpiInput');
+    const resultDisplay = document.getElementById('resultDisplay');
+    const toast = document.getElementById('toast');
 
-            try {
-                var c = v;
-                // iPhoneが嫌がらない最小限の置換
-                c = c.replace(/<\?xml.*?\?>/gi, '');
-                c = c.replace(/<!DOCTYPE.*?>/gi, '');
-                c = c.replace(//g, '');
-                c = c.replace(/<metadata>[\s\S]*?<\/metadata>/gi, '');
-                
-                // 小数点丸め（これが動けば勝利）
-                c = c.replace(/(\d+\.\d{3,})/g, function(m) {
-                    return parseFloat(m).toFixed(2);
-                });
+    function handleInput() {
+        // Remove non-numeric chars except dot
+        wInput.value = wInput.value.replace(/[^0-9.]/g, '');
+        hInput.value = hInput.value.replace(/[^0-9.]/g, '');
+        
+        document.getElementById('clr-w').classList.toggle('active', wInput.value !== '');
+        document.getElementById('clr-h').classList.toggle('active', hInput.value !== '');
+        calc();
+    }
 
-                // 詰め
-                c = c.replace(/>\s+</g, '><');
-                c = c.trim();
+    function clearInput(id) {
+        document.getElementById(id).value = '';
+        handleInput();
+        document.getElementById(id).focus();
+    }
 
-                o.value = c;
-                var p = Math.round(((v.length - c.length) / v.length) * 100);
-                l.innerText = "Reduced: " + (p > 0 ? p : 0) + "%";
-            } catch(e) {
-                o.value = "Error";
-            }
+    function setPaper(w, h) {
+        wInput.value = w;
+        hInput.value = h;
+        handleInput();
+    }
+
+    function setDPI(val) {
+        dpiInput.value = val;
+        calc();
+    }
+
+    function calc() {
+        const w = parseFloat(wInput.value) || 0;
+        const h = parseFloat(hInput.value) || 0;
+        const dpi = parseFloat(dpiInput.value) || 0;
+
+        if (w > 0 && h > 0 && dpi > 0) {
+            const pxW = Math.round((w * dpi) / 25.4);
+            const pxH = Math.round((h * dpi) / 25.4);
+            resultDisplay.innerText = `${pxW} × ${pxH} px`;
+        } else {
+            resultDisplay.innerText = `0 × 0 px`;
         }
-    </script>
+    }
+
+    async function copyResult() {
+        const text = resultDisplay.innerText;
+        if (text === "0 × 0 px") return;
+        try {
+            await navigator.clipboard.writeText(text.replace(' px', ''));
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 1500);
+        } catch (err) {}
+    }
+
+    function showModal() { document.getElementById('modal').style.display = 'flex'; }
+    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+</script>
 
 </body>
 </html>
