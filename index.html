@@ -18,6 +18,7 @@
             --radius: 15px;
             --text-gray: #666;
             --placeholder: #bbb;
+            --success: #2ecc71; /* Copied! Color */
         }
 
         body {
@@ -71,16 +72,16 @@
         }
         .tgl-btn.active { background: var(--main); color: #fff; }
 
-        /* Main Input Area */
+        /* Main Input Area (with Swap) */
         .input-card { margin-bottom: 15px; }
-        .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
         .input-group { flex: 1; position: relative; text-align: left; }
         .input-sub-label { font-size: 0.75rem; font-weight: 800; color: var(--text-gray); margin-left: 5px; margin-bottom: 4px; display: block; }
         
         input {
             width: 100%;
             padding: 18px 12px;
-            padding-right: 35px;
+            padding-right: 30px;
             border: 2px solid var(--border);
             border-radius: var(--radius);
             background: #fff;
@@ -96,23 +97,31 @@
         input::placeholder { color: var(--placeholder); -webkit-text-fill-color: var(--placeholder); }
 
         .clr-btn {
-            position: absolute; right: 10px; top: 50%;
-            margin-top: 8px;
+            position: absolute; right: 8px; top: 50%;
+            margin-top: 8px; /* Adjusted for label */
             background: #ddd; color: #fff; width: 18px; height: 18px;
             border-radius: 50%; border: none; font-size: 10px; font-weight: 800;
             cursor: pointer; display: none; align-items: center; justify-content: center;
         }
         .clr-btn.active { display: flex; }
 
-        /* Presets Area */
+        /* Swap Button (W <-> H) */
+        .swap-btn {
+            border: none; background: none; font-size: 1.2rem; 
+            color: var(--border); font-weight: 800; padding: 5px;
+            margin-top: 15px; cursor: pointer;
+        }
+        .swap-btn:active { transform: scale(0.9); color: var(--main); }
+
+        /* Paper Presets Area */
         .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
         .p-btn {
             background: var(--accent); border: none; padding: 12px 5px; border-radius: 12px;
-            font-size: 0.8rem; font-weight: 800; color: var(--main); cursor: pointer;
+            font-size: 0.85rem; font-weight: 800; color: var(--main); cursor: pointer;
         }
         .p-btn:active { transform: scale(0.95); background: var(--border); }
 
-        /* DPI Area */
+        /* DPI Area (Sub-priority) */
         .dpi-section {
             background: var(--input-bg);
             padding: 15px;
@@ -133,15 +142,19 @@
         }
         .dpi-q-btn.active { background: var(--main); color: #fff; }
 
-        /* Result Area */
+        /* Result Area (Main Visual) with Inline Copied State */
         .result-box {
             background: var(--main); color: #fff; padding: 25px 15px;
             border-radius: var(--radius); margin-top: auto; cursor: pointer;
             position: relative; overflow: hidden;
+            transition: background-color 0.2s, transform 0.1s;
         }
+        .result-box.copied { background-color: var(--success); }
         .result-box:active { transform: scale(0.98); }
-        .res-label { font-size: 0.75rem; font-weight: 700; opacity: 0.5; margin-bottom: 8px; display: block; }
-        .res-val { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+        
+        .res-label { font-size: 0.75rem; font-weight: 700; opacity: 0.5; margin-bottom: 8px; display: block; transition: opacity 0.2s; }
+        .res-val { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; transition: opacity 0.2s; }
+        
         .bleed-badge {
             position: absolute; top: 8px; right: 12px; font-size: 0.6rem; 
             font-weight: 800; color: #fff; opacity: 0; transition: opacity 0.2s;
@@ -149,13 +162,6 @@
         .bleed-badge.visible { opacity: 0.4; }
 
         /* Common Elements */
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--main); color: #fff; padding: 10px 20px;
-            border-radius: 20px; font-size: 0.85rem; font-weight: 700;
-            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
-        }
-
         footer { margin-top: 40px; font-size: 11px; color: #777; line-height: 1.8; font-weight: 500; }
         footer a { color: inherit; text-decoration: underline; }
         .footer-btns { margin-top: 25px; }
@@ -170,6 +176,7 @@
             border-radius: var(--radius); font-weight: 800; font-size: 13px; cursor: pointer;
         }
 
+        /* Modal Style */
         #modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
@@ -182,8 +189,6 @@
     </style>
 </head>
 <body>
-
-<div id="toast">Copied!</div>
 
 <div class="container">
     <h1>Paper to Pixel</h1>
@@ -213,6 +218,7 @@
                 <input type="text" id="wIn" placeholder="Width" inputmode="decimal" oninput="upd()">
                 <button class="clr-btn" id="clr-w" onclick="cls('wIn')">×</button>
             </div>
+            <button class="swap-btn" onclick="swap()">⇄</button>
             <div class="input-group">
                 <span class="input-sub-label">Height</span>
                 <input type="text" id="hIn" placeholder="Height" inputmode="decimal" oninput="upd()">
@@ -246,9 +252,9 @@
         </div>
     </div>
 
-    <div class="result-box" onclick="cp()">
+    <div class="result-box" id="result-box" onclick="cp()">
         <span class="bleed-badge" id="bleed-badge">+3mm bleed included</span>
-        <span class="res-label">Required Pixels (Tap to copy)</span>
+        <span class="res-label" id="res-label">Required Pixels (Tap to copy)</span>
         <div class="res-val" id="res">0 × 0 px</div>
     </div>
 
@@ -276,10 +282,13 @@
 <script>
     let unit = 'mm';
     let bleed = false;
+    let isCopying = false; // Prevent interactions during copy animation
     const wEl = document.getElementById('wIn');
     const hEl = document.getElementById('hIn');
     const dEl = document.getElementById('dpi');
     const rEl = document.getElementById('res');
+    const rLabel = document.getElementById('res-label');
+    const rBox = document.getElementById('result-box');
     const bBadge = document.getElementById('bleed-badge');
     const cardBtn = document.getElementById('card-btn');
 
@@ -287,6 +296,7 @@
         let w = parseFloat(wEl.value) || 0;
         let h = parseFloat(hEl.value) || 0;
         if (w > 0 && h > 0) {
+            // Precise Automatic Conversion
             if (u === 'in' && unit === 'mm') {
                 wEl.value = (w / 25.4).toFixed(2);
                 hEl.value = (h / 25.4).toFixed(2);
@@ -298,6 +308,7 @@
         unit = u;
         document.getElementById('btn-mm').classList.toggle('active', u==='mm');
         document.getElementById('btn-in').classList.toggle('active', u==='in');
+        // Smart Card Preset Toggle
         cardBtn.innerText = (unit === 'mm') ? 'Card (JP)' : 'Card (US)';
         upd();
     }
@@ -317,6 +328,7 @@
         document.getElementById('clr-h').classList.toggle('active', hEl.value !== '');
         document.getElementById('clr-d').classList.toggle('active', dEl.value !== '');
         
+        // Active DPI button feedback
         const dVal = parseInt(dEl.value);
         [72, 350, 600].forEach(v => {
             document.getElementById('dq-' + v).classList.toggle('active', dVal === v);
@@ -332,9 +344,19 @@
         upd();
     }
 
+    // W <-> H Swap Logic
+    function swap() {
+        if (!isCopying) {
+            let temp = wEl.value;
+            wEl.value = hEl.value;
+            hEl.value = temp;
+            upd();
+        }
+    }
+
     function setCard() {
         if (unit === 'mm') setP(91, 55);
-        else setP(0, 0, 3.5, 2);
+        else setP(0, 0, 3.5, 2); // 3.5 x 2 inch (US standard)
     }
 
     function calc() {
@@ -346,9 +368,11 @@
             let cw = w;
             let ch = h;
             if (bleed) {
+                // Bleed +3mm on each side = +6mm total or +0.25 inch
                 cw += (unit === 'mm') ? 6 : 0.25;
                 ch += (unit === 'mm') ? 6 : 0.25;
             }
+            // Pixel = (Size * DPI) / 25.4 (for mm)
             const pw = (unit === 'mm') ? Math.round((cw * d) / 25.4) : Math.round(cw * d);
             const ph = (unit === 'mm') ? Math.round((ch * d) / 25.4) : Math.round(ch * d);
             rEl.innerText = pw + ' × ' + ph + ' px';
@@ -357,12 +381,33 @@
         }
     }
 
-    function cp() {
-        if (rEl.innerText === '0 × 0 px') return;
-        navigator.clipboard.writeText(rEl.innerText.replace(' px', ''));
-        const t = document.getElementById('toast');
-        t.style.opacity = '1';
-        setTimeout(() => t.style.opacity = '0', 1500);
+    // Copy with Inline Feedback
+    async function cp() {
+        if (rEl.innerText === '0 × 0 px' || isCopying) return;
+        isCopying = true;
+        const currentVal = rEl.innerText;
+        const currentLabel = rLabel.innerText;
+
+        try {
+            await navigator.clipboard.writeText(currentVal.replace(' px', ''));
+            // Inline Feedback animation
+            rBox.classList.add('copied');
+            rLabel.style.opacity = '0'; // Temporary hide label
+            
+            setTimeout(() => {
+                rEl.innerText = 'Copied!';
+                rLabel.style.opacity = '1';
+                rLabel.innerText = 'Number Copied';
+            }, 100);
+
+            setTimeout(() => {
+                rBox.classList.remove('copied');
+                rEl.innerText = currentVal;
+                rLabel.innerText = currentLabel;
+                isCopying = false;
+            }, 1500);
+
+        } catch (e) { isCopying = false; }
     }
 
     function showM() { document.getElementById('modal').style.display = 'flex'; }
