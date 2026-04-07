@@ -5,19 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SVG Trimmer</title>
     <style>
-        :root { --main: #333; --bg: #fff; --radius: 15px; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 400px; text-align: center; }
-        textarea {
-            width: 100%; height: 160px; padding: 15px; margin-bottom: 20px;
-            border: 2px solid #eee; border-radius: var(--radius);
-            background: #fafafa; font-size: 16px; outline: none;
+        :root {
+            --main: #333;
+            --bg: #fff;
+            --accent: #eee;
+            --radius: 15px;
         }
-        .stat { background: #f0f0f0; padding: 15px; border-radius: var(--radius); font-weight: 800; margin-bottom: 20px; }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -1px; }
+        .sub { font-size: 0.85rem; color: #888; margin-bottom: 30px; font-weight: 600; }
+
+        textarea {
+            width: 100%; height: 180px;
+            padding: 15px; margin-bottom: 20px;
+            border: 2px solid var(--accent);
+            border-radius: var(--radius);
+            background: #fafafa;
+            font-size: 16px; /* iOSズーム防止 */
+            font-family: ui-monospace, monospace;
+            outline: none;
+            -webkit-user-select: text !important;
+        }
+
+        .stat-box {
+            background: #f0f0f0;
+            padding: 18px;
+            border-radius: var(--radius);
+            font-weight: 800;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            color: var(--main);
+        }
+
+        /* 疎通確認済みリンクボタン */
         .btn {
-            display: block; width: 100%; padding: 20px; background: var(--main); color: #fff;
-            text-decoration: none; border-radius: var(--radius); font-weight: 800; margin-bottom: 15px;
+            display: block; width: 100%; padding: 20px;
+            background: var(--main); color: #fff;
+            text-decoration: none; border-radius: var(--radius);
+            font-weight: 800; font-size: 1.1rem;
+            margin-bottom: 15px;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.7; }
+        .btn-gray { background: #eee; color: var(--main); }
+
+        footer { margin-top: 50px; font-size: 10px; color: #bbb; font-weight: 600; line-height: 1.8; }
+
+        /* モーダル */
+        #modal {
+            display: none; position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: #fff; padding: 30px; border-radius: var(--radius);
+            width: 85%; max-width: 320px; text-align: left;
         }
     </style>
 </head>
@@ -25,53 +88,80 @@
 
 <div class="container">
     <h1>SVG Trimmer</h1>
-    <textarea id="svgInput" placeholder="Paste SVG here..."></textarea>
-    <div class="stat" id="statLabel">Reduced: --- %</div>
+    <p class="sub">Minimalize your SVG code instantly.</p>
     
-    <a href="javascript:void(0)" class="btn" onclick="goShave()">SHAVE & COPY</a>
+    <textarea id="svgInput" placeholder="Paste SVG Code here..."></textarea>
+
+    <div class="stat-box" id="statLabel">Reduced: --- %</div>
+
+    <a href="javascript:void(0)" class="btn" onclick="runShave()">SHAVE & COPY</a>
+
+    <a href="javascript:void(0)" class="btn btn-gray" onclick="document.getElementById('modal').style.display='flex'">Add to Home Screen</a>
     
-    <a href="javascript:void(0)" class="btn" style="background:#eee; color:#333;" onclick="alert('Working')">TEST BUTTON</a>
+    <footer>
+        No login / No tracking / No ads / Browser only<br>
+        afrorakda &copy; 2026
+    </footer>
+</div>
+
+<div id="modal" onclick="this.style.display='none'">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0">📱 Install</h3>
+        <p style="font-size:0.9rem">Add to your home screen.</p>
+        <p style="font-size:0.8rem">🍏 <strong>iPhone:</strong> Tap Share, then Add to Home Screen.</p>
+        <a href="javascript:void(0)" class="btn btn-gray" style="padding:12px; margin-top:10px; font-size:0.9rem;" onclick="document.getElementById('modal').style.display='none'">Close</a>
+    </div>
 </div>
 
 <script>
-    function goShave() {
+    function runShave() {
         var input = document.getElementById('svgInput');
+        var raw = input.value.trim();
         var label = document.getElementById('statLabel');
-        var str = input.value.trim();
-        
-        if(!str) { alert('Paste SVG'); return; }
+
+        if(!raw) { alert('Please paste SVG code'); return; }
 
         try {
-            // 正規表現を使わず、改行とスペースを1つずつ消す超・原始的ループ
-            var clean = "";
-            var lastChar = "";
-            for (var i = 0; i < str.length; i++) {
-                var c = str[i];
-                // 改行やタブをスペース1つに置き換えるだけの超安全処理
-                if (c === '\n' || c === '\r' || c === '\t') {
-                    c = ' ';
-                }
-                // 連続するスペースを省く
-                if (!(c === ' ' && lastChar === ' ')) {
-                    clean += c;
-                }
-                lastChar = c;
+            var c = raw;
+            // 段階的に、優しくクリーニング（Safari対策）
+            c = c.replace(/<\?xml.*?\?>/gi, '');
+            c = c.replace(/<!DOCTYPE.*?>/gi, '');
+            c = c.replace(//g, '');
+            c = c.replace(/<metadata>[\s\S]*?<\/metadata>/gi, '');
+            c = c.replace(/<desc>[\s\S]*?<\/desc>/gi, '');
+            
+            // 不要な属性を一つずつ消す
+            var attrs = ['id', 'class', 'version', 'xmlns:xlink', 'xml:space', 'enable-background', 'sodipodi:docname', 'inkscape:version', 'x', 'y', 'style'];
+            for(var i=0; i<attrs.length; i++) {
+                var re = new RegExp('\\s' + attrs[i] + '=".*?"', 'gi');
+                c = c.replace(re, ' ');
             }
 
-            // 削減率の表示
-            var pct = Math.round(((str.length - clean.length) / str.length) * 100);
-            label.innerText = "Reduced: " + pct + "%";
+            // 小数点丸め（3桁以上を2桁へ）
+            c = c.replace(/(\d+\.\d{3,})/g, function(m) {
+                return parseFloat(m).toFixed(2);
+            });
+
+            // 空白を詰める
+            c = c.replace(/>\s+</g, '><');
+            c = c.trim();
+
+            // 削減率計算
+            var diff = raw.length - c.length;
+            var pct = Math.round((diff / raw.length) * 100);
+            label.innerText = "Reduced: " + (pct > 0 ? pct : 0) + "%";
 
             // コピー
-            var t = document.createElement('textarea');
-            t.value = clean;
-            document.body.appendChild(t);
-            t.select();
+            var tmp = document.createElement('textarea');
+            tmp.value = c;
+            document.body.appendChild(tmp);
+            tmp.select();
             document.execCommand('copy');
-            document.body.removeChild(t);
+            document.body.removeChild(tmp);
 
-            alert('DONE: ' + pct + '%');
-        } catch (e) {
+            alert('Success: ' + pct + '% Reduced & Copied!');
+
+        } catch(e) {
             alert('Error: ' + e.message);
         }
     }
