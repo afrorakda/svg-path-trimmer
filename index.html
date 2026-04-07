@@ -16,7 +16,7 @@
             --radius: 15px;
         }
 
-        /* iOS Safari徹底ガード */
+        /* iOS Safari 全体ガード */
         * {
             -webkit-user-select: none;
             user-select: none;
@@ -25,23 +25,21 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        input, textarea {
+        textarea {
             -webkit-user-select: text !important;
             user-select: text !important;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #f5f5f5;
             color: var(--main);
             margin: 0;
             height: 100vh;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* 背面のプレビューエリア */
+        /* プレビュー背景 */
         #preview-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -52,29 +50,29 @@
             padding: 40px;
             background-color: #fff;
             background-image: 
-                linear-gradient(45deg, #f8f8f8 25%, transparent 25%), 
-                linear-gradient(-45deg, #f8f8f8 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #f8f8f8 75%), 
-                linear-gradient(-45deg, transparent 75%, #f8f8f8 75%);
+                linear-gradient(45deg, #eee 25%, transparent 25%), 
+                linear-gradient(-45deg, #eee 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #eee 75%), 
+                linear-gradient(-45deg, transparent 75%, #eee 75%);
             background-size: 20px 20px;
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
         #preview-bg svg { max-width: 80%; max-height: 50%; object-fit: contain; }
 
-        /* ボトム・コントロールユニット */
-        .bottom-ui {
+        /* ボトムユニット */
+        .ui-layer {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
-            z-index: 10;
-            padding: 10px 15px calc(15px + env(safe-area-inset-bottom));
-            background: linear-gradient(to top, rgba(240,240,240,1) 85%, rgba(240,240,240,0));
+            z-index: 100;
+            padding: 10px 15px calc(25px + env(safe-area-inset-bottom));
+            background: linear-gradient(to top, #f5f5f5 85%, transparent);
             pointer-events: none;
         }
 
-        .control-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+        .panel {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 15px;
             border-radius: var(--radius);
             box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
@@ -84,80 +82,77 @@
             margin: 0 auto;
         }
 
-        .header-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
-        h1 { font-size: 1rem; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
-        .stats { font-size: 0.7rem; color: #888; font-weight: 700; margin-left: auto; }
+        .row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+        h1 { font-size: 1rem; font-weight: 900; margin: 0; }
+        .rate { font-size: 0.7rem; color: #888; font-weight: 800; margin-left: auto; }
 
         textarea {
-            width: 100%; height: 80px; padding: 10px;
+            width: 100%; height: 80px; padding: 12px;
             border: 2px solid var(--accent); border-radius: 10px;
-            font-size: 0.75rem; font-family: ui-monospace, monospace;
+            font-size: 0.75rem; font-family: monospace;
             background: #fafafa; outline: none; resize: none; margin-bottom: 10px;
-            pointer-events: auto;
         }
 
-        .action-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        .btn {
-            flex: 1; height: 46px; border-radius: 10px; border: none;
-            font-weight: 800; cursor: pointer; transition: transform 0.1s;
-            touch-action: manipulation; display: flex; align-items: center; justify-content: center;
+        .btns { display: flex; gap: 8px; margin-bottom: 10px; }
+        .b {
+            flex: 1; height: 48px; border-radius: 10px; border: none;
+            font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
         }
-        .btn-main { background: var(--main); color: #fff; font-size: 0.95rem; }
-        .btn-sub { background: #eee; color: var(--main); font-size: 0.8rem; }
-        .btn:active { transform: scale(0.96); opacity: 0.8; }
+        .b-main { background: var(--main); color: #fff; font-size: 0.9rem; }
+        .b-sub { background: #eee; color: var(--main); font-size: 1.1rem; flex: 0.3; }
+        .b:active { opacity: 0.7; transform: scale(0.96); }
 
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--main); color: #fff; padding: 10px 20px;
             border-radius: 20px; font-size: 0.8rem; font-weight: 800;
-            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000;
         }
 
-        .sub-links { display: flex; gap: 8px; margin-top: 10px; max-width: 420px; margin-left: auto; margin-right: auto; pointer-events: auto; }
-        .link-btn { flex: 1; background: rgba(255,255,255,0.8); border: 1px solid var(--accent); padding: 10px; border-radius: 10px; text-decoration: none; color: var(--main); font-size: 10px; font-weight: 700; text-align: center; }
+        .links { display: flex; gap: 8px; margin-top: 10px; max-width: 420px; margin-left: auto; margin-right: auto; pointer-events: auto; }
+        .link { flex: 1; background: #fff; border: 1px solid var(--accent); padding: 12px; border-radius: 10px; text-decoration: none; color: var(--main); font-size: 10px; font-weight: 700; text-align: center; }
 
-        footer { margin-top: 10px; text-align: center; font-size: 9px; color: #aaa; font-weight: 600; pointer-events: auto; }
+        footer { margin-top: 12px; text-align: center; font-size: 9px; color: #aaa; font-weight: 600; pointer-events: auto; }
 
         /* モーダル */
         #modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100;
+            background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 200;
             pointer-events: auto;
         }
-        #modal.active { display: flex; }
         .modal-content {
             background: #fff; width: 85%; max-width: 320px; padding: 30px;
             border-radius: var(--radius); position: relative;
         }
-        .close-x { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #888; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="preview-bg">
-    <div id="svg-display" style="color:#ccc; font-weight:900;">PREVIEW</div>
+    <div id="svg-display" style="color:#ddd; font-weight:900;">PREVIEW</div>
 </div>
 
 <div id="toast">Copied!</div>
 
-<div class="bottom-ui">
-    <div class="control-panel">
-        <div class="header-row">
+<div class="ui-layer">
+    <div class="panel">
+        <div class="row">
             <h1>SVG Trimmer</h1>
-            <div class="stats" id="stat-text">Reduced: 0%</div>
+            <div class="rate" id="resRate">Reduced: 0%</div>
         </div>
 
-        <textarea id="svgInput" placeholder="Paste SVG here..." spellcheck="false"></textarea>
+        <textarea id="svgIn" placeholder="Paste SVG Code here..." oninput="shaveSVG()"></textarea>
 
-        <div class="action-row">
-            <button id="clearBtn" class="btn btn-sub" style="flex:0.3">×</button>
-            <button id="copyBtn" class="btn btn-main">Copy Trimmed SVG</button>
+        <div class="btns">
+            <button class="b b-sub" onclick="resetIn()">×</button>
+            <button class="b b-main" onclick="copySVG()">Copy Trimmed SVG</button>
         </div>
     </div>
 
-    <div class="sub-links">
-        <a href="https://ko-fi.com/afrorakda" target="_blank" class="link-btn">☕️ buy me a coffee</a>
-        <button id="modalBtn" class="link-btn">📱 Add to Home</button>
+    <div class="links">
+        <a href="https://ko-fi.com/afrorakda" target="_blank" class="link">☕️ buy me a coffee</a>
+        <button class="link" onclick="openM()">📱 Add to Home</button>
     </div>
 
     <footer>
@@ -166,9 +161,9 @@
     </footer>
 </div>
 
-<div id="modal">
-    <div class="modal-content">
-        <span class="close-x" id="closeModal">×</span>
+<div id="modal" onclick="closeM()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span style="position:absolute; top:15px; right:20px; font-size:24px; color:#888; cursor:pointer;" onclick="closeM()">×</span>
         <h3 style="margin-top:0">📱 Install</h3>
         <p style="font-size:0.9rem">Add to your home screen.</p>
         <p style="font-size:0.8rem">🍏 <strong>iPhone:</strong> Tap Share, then Add to Home Screen.</p>
@@ -177,72 +172,69 @@
 </div>
 
 <script>
-    const input = document.getElementById('svgInput');
-    const display = document.getElementById('svg-display');
-    const statText = id => document.getElementById(id);
-    const toast = document.getElementById('toast');
-    let trimmedOutput = "";
+    var inputEl = document.getElementById('svgIn');
+    var dispEl = document.getElementById('svg-display');
+    var rateEl = document.getElementById('resRate');
+    var toastEl = document.getElementById('toast');
+    var modalEl = document.getElementById('modal');
+    var finalSVG = "";
 
-    // 処理ロジック
-    const processSVG = () => {
-        const raw = input.value.trim();
+    function shaveSVG() {
+        var raw = inputEl.value.trim();
         if (!raw) {
-            display.innerHTML = "PREVIEW";
-            statText('stat-text').innerText = "Reduced: 0%";
-            trimmedOutput = "";
+            dispEl.innerHTML = "PREVIEW";
+            rateEl.innerText = "Reduced: 0%";
+            finalSVG = "";
             return;
         }
 
         try {
-            let clean = raw
+            var clean = raw
                 .replace(/<\?xml.*?\?>/gi, '')
                 .replace(/<!DOCTYPE.*?>/gi, '')
                 .replace(//g, '')
                 .replace(/\s(id|class|version|xmlns:xlink|xml:space|enable-background|x|y|style|sodipodi:docname|inkscape:version)=".*?"/gi, '')
-                .replace(/(\d+\.\d{3,})/g, m => parseFloat(parseFloat(m).toFixed(2)))
+                .replace(/(\d+\.\d{3,})/g, function(m) { return parseFloat(parseFloat(m).toFixed(2)); })
                 .replace(/>\s+</g, '><')
                 .trim();
 
-            trimmedOutput = clean;
-            display.innerHTML = trimmedOutput;
+            finalSVG = clean;
+            dispEl.innerHTML = finalSVG;
             
-            const rate = Math.round(((raw.length - clean.length) / raw.length) * 100);
-            statText('stat-text').innerText = `Reduced: ${rate > 0 ? rate : 0}%`;
+            var r = Math.round(((raw.length - clean.length) / raw.length) * 100);
+            rateEl.innerText = "Reduced: " + (r > 0 ? r : 0) + "%";
         } catch (e) {
-            display.innerHTML = '<span style="color:red">Error</span>';
+            dispEl.innerHTML = '<span style="color:red">Parse Error</span>';
         }
-    };
+    }
 
-    // イベント登録
-    input.addEventListener('input', processSVG);
+    function resetIn() {
+        inputEl.value = '';
+        shaveSVG();
+        inputEl.focus();
+    }
 
-    document.getElementById('clearBtn').addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        input.value = '';
-        processSVG();
-        input.focus();
-    });
-
-    document.getElementById('copyBtn').addEventListener('touchstart', async (e) => {
-        e.preventDefault();
-        document.activeElement.blur(); // フォーカス強制解除
-        if (!trimmedOutput) return;
+    function copySVG() {
+        inputEl.blur(); // フォーカス解除
+        if (!finalSVG) return;
+        
+        // フォールバック付きコピー
+        var temp = document.createElement('textarea');
+        temp.value = finalSVG;
+        document.body.appendChild(temp);
+        temp.select();
         try {
-            await navigator.clipboard.writeText(trimmedOutput);
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 1200);
-        } catch (err) {}
-    });
+            document.execCommand('copy');
+            toastEl.style.opacity = '1';
+            setTimeout(function() { toastEl.style.opacity = '0'; }, 1200);
+        } catch (err) {
+            console.log('Copy Error');
+        }
+        document.body.removeChild(temp);
+    }
 
-    // モーダル制御
-    const modal = document.getElementById('modal');
-    document.getElementById('modalBtn').addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        modal.classList.add('active');
-    });
-    document.getElementById('closeModal').addEventListener('touchstart', () => modal.classList.remove('active'));
-    modal.addEventListener('touchstart', (e) => { if(e.target === modal) modal.classList.remove('active'); });
-
+    function openM() { modalEl.style.display = 'flex'; }
+    function closeM() { modalEl.style.display = 'none'; }
 </script>
 
 </body>
